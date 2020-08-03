@@ -20,6 +20,10 @@
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js"
 	crossorigin="anonymous"></script>
+	
+<script src="/webjars/sockjs-client/sockjs.min.js"></script>
+<script src="/webjars/stomp-websocket/stomp.min.js"></script>
+
 </head>
 
 <body class="sb-nav-fixed">
@@ -166,6 +170,83 @@
 		crossorigin="anonymous"></script>
 	<script src="assets/demo/datatables-demo.js"></script>
 
+	<script type="text/javascript">
+		// conectamos el ws
+		const socket = new SockJS('/wsocket-connector');
+		stompClient = Stomp.over(socket);
+
+		stompClient.connect({}, (frame) => {
+	        console.log('Conectado: ' + frame);
+
+
+			// se subscribe al @SendTo("/intermedia/ws-usuario")
+			// cuando se ejecute, acá llegará su resultado
+	        stompClient.subscribe(
+	   	        '/intermedia/ws-usuario',
+	   	        usuario => {
+		   	        imprimeFila(JSON.parse(usuario.body))
+		   	    }
+	    	)
+			
+		});
+
+		// asignamos el valor de una fila de la tabla
+		const imprimeFila = (usuario) => {
+			// capturamos la tabla
+			const table = $('#dataTable').DataTable()
+			
+			let fila = ''
+			+ '	<tr>														'
+			+ '		<td>' + usuario.id + '</td>								'
+			+ '		<td>' + usuario.nombre + '</td>							'
+			+ '		<td>' + usuario.correo + '</td>							'
+			+ '		<td>' + usuario.contrasenia.substring(0, 10) + '***</td>'
+			+ '		<td>' + usuario.rol + '</td>							'
+			+ '	</tr>														'
+			
+			table.row.add($(fila)[0]).draw();
+		}
+
+	</script>
+
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

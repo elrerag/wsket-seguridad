@@ -29,42 +29,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
        this.manejadorDeAutentificacion = manejadorDeAutentificacion;
     }
     
-    /**
-     * este método que será desechado más adelante
-     * se encarga de crear usuarios por defecto
-     */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception{
-        // acá se usa nuestro (AuthServiceImpl), para personalizar.
-        // el inicio de sesión o la carga del usuario prinsipal User.
         auth.userDetailsService(servicioDetallesDeUsuario)
         .passwordEncoder(EncoderUtils.passwordEncoder());
-//        String adminUsername = "admin@mail.cl";
-//        String adminPassword = EncoderUtils.passwordEncoder().encode("1234");
-//        String adminRole = "ADMIN";
-//
-//        String userUsername = "user@mail.cl";
-//        String userPassword = EncoderUtils.passwordEncoder().encode("1234");
-//        String userRole = "USER";
-//
-//        auth.inMemoryAuthentication()
-//        .withUser(adminUsername).password(adminPassword).roles(adminRole)
-//        .and()
-//        .withUser(userUsername).password(userPassword).roles(userRole);
     }
 
-    /**
-     * Acá irá la configuración principal
-     * Las reglas serán impuestas en este
-     * método.
-     */
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        // csrf - desactivamos por seguridad
         http.csrf().disable()
-        // configurar los request autorizados
         .authorizeRequests()
-        //acceso a direcctorios
         .antMatchers("/admin/**").hasRole("ADMIN") // no es ROLE_ADMIN ni ROLE_USER (sin el ROLE_)
         .antMatchers("/login").permitAll()
         // permite el uso de los recursos estáticos

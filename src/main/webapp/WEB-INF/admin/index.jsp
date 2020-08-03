@@ -21,6 +21,9 @@
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js"
 	crossorigin="anonymous"></script>
+
+<script src="/webjars/sockjs-client/sockjs.min.js"></script>
+<script src="/webjars/stomp-websocket/stomp.min.js"></script>
 </head>
 
 <body class="sb-nav-fixed">
@@ -79,7 +82,10 @@
 				<div class="container-fluid">
 					<h1 class="mt-4">Administración del sitio</h1>
 
-					<form action="<c:url value='/admin' />" method="post">
+					<form
+						id='formulario' 
+						action="<c:url value='/admin' />" 
+						method="post">
 
 						<!-- nombre -->
 						<div class="form-group">
@@ -95,7 +101,7 @@
 
 						<!-- contraseña -->
 						<div class="form-group">
-							<label for="correo">Contraseña</label> <input type="password"
+							<label for="contrasenia">Contraseña</label> <input type="password"
 								class="form-control" id="contrasenia" name="contrasenia">
 						</div>
 
@@ -108,7 +114,10 @@
 							</select>
 						</div>
 
-						<button type="submit" class="btn btn-primary">Submit</button>
+						<button 
+							onclick="ingresar(event)"
+							type="button" 
+							class="btn btn-primary">Submit</button>
 					</form>
 
 				</div>
@@ -154,7 +163,63 @@
 		src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"
 		crossorigin="anonymous"></script>
 	<script src="assets/demo/datatables-demo.js"></script>
+	
+	<script type="text/javascript">
+	// conectamos el ws
+		const socket = new SockJS('/wsocket-connector');
+		const stompClient = Stomp.over(socket);
+		stompClient.connect({}, (frame) => {
+		    console.log('Conectado: ' + frame);
+		});
+
+		const ingresar = (e) => {
+			e.preventDefault()
+			const formulario = e.target.parentElement
+
+	     	// enviamos el evento al wsocket
+	     	const data = {
+	    	     'nombre': 	formulario.nombre.value,
+	    	     'correo': 	formulario.correo.value,
+	    	     'contrasenia': formulario.contrasenia.value,
+	    	     'rol': formulario.rol.value,
+	    	}
+
+	     	// enviamos el usario ingresado a @SendTo("/intermedia/ws-usuario")
+	 		stompClient.send('/aplicacion/ws-usuario', {}, JSON.stringify(data));
+// 			formulario.submit();
+		}
+	</script>
 
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
